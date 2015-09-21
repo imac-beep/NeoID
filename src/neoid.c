@@ -14,8 +14,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    sleep(1); //防止你起的太快
-
     printf("[Start with: machine_id = %d, port = %d, backlog = %d]\n", opt.machine_id, opt.port, opt.backlog);
 
     if (opt.deamonize && NID_ERROR == nid_deamon_init()) {

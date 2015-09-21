@@ -5,9 +5,11 @@ static void nid_genid_timer(int signo);
 
 static uint32_t subid = 0x00FFFFFF;
 static nid_bool_t resettime = NID_FALSE;
-static uint64_t timestamp;
+static time_t timestamp;
+static uint64_t tempid;
+static uint64_t machine_id;
 
-extern uint64_t nid_genid_new(uint8_t mid) {
+extern uint64_t nid_genid_new() {
     if (resettime || ++subid > 0x00FFFFFF) { //如果id尾部(24 bits)溢出，读秒并轮转
         /**
          * 如果跑的过快（一秒钟跑了超过一千六百万条），则等到下一秒
@@ -32,22 +34,26 @@ extern uint64_t nid_genid_new(uint8_t mid) {
                 return 0;
             }
             timestamp -= 0xFFFFFFFF;
+            tempid = (uint64_t)timestamp << 31 | machine_id;
         }
     }
 
-    return timestamp << 31 | (uint32_t)mid << 24 | subid;
+    return tempid | subid;
 }
 
 static void nid_genid_timer(int signo) {
     if (SIGALRM == signo) {
-        timestamp = (uint64_t)time(NULL);
+        timestamp = time(NULL);
+        tempid = (uint64_t)timestamp << 31 | machine_id;
         resettime = NID_TRUE;
     }
 }
 
-extern int32_t nid_genid_init(void) {
+extern int32_t nid_genid_init(uint8_t mid) {
     struct sigaction sa;
     struct itimerval itv;
+
+    machine_id = (uint64_t)mid << 24;
 
     sa.sa_flags = 0;
     sa.sa_handler = nid_genid_timer;

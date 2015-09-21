@@ -24,7 +24,7 @@ int32_t nid_server_start(uint16_t port, uint32_t backlog, uint8_t machine_id) {
         return NID_ERROR;
     }
 
-    if (NID_ERROR == nid_genid_init()) {
+    if (NID_ERROR == nid_genid_init(env.machine_id)) {
         perror("NeoID");
         return NID_ERROR;
     }
@@ -181,7 +181,7 @@ int32_t nid_server_data_process(register const struct server_env *env, register 
         }
     }
 
-    if (write(fd, &(uint64_t){nid_genid_new(env->machine_id)}, sizeof(uint64_t)) < 1) {
+    if (write(fd, &(uint64_t){nid_genid_new()}, sizeof(uint64_t)) < 1) {
         perror("Write");
         return NID_ERROR;
     }

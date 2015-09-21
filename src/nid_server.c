@@ -173,19 +173,35 @@ int32_t nid_server_accept_process(register const struct server_env *env) {
 }
 
 static char buffer[BUFSIZ];
-static int64_t rcount;
+static int64_t read_count;
+static void *send_data;
+static size_t send_data_len;
+static nid_bool_t char_mode;
 int32_t nid_server_data_process(register const struct server_env *env, register int32_t fd) {
-    while ((rcount = read(fd, buffer, BUFSIZ)) > 0) {
-        if (rcount < BUFSIZ) {
+    while ((read_count = read(fd, buffer, BUFSIZ)) > 0) {
+        if (read_count < BUFSIZ) {
             break;
         }
     }
 
-    if (write(fd, &(uint64_t){nid_genid_new()}, sizeof(uint64_t)) < 1) {
+    if (1 == read_count && 'b' == buffer[0]) {
+        send_data = &(uint64_t){nid_genid_new()};
+        send_data_len = sizeof(uint64_t);
+        char_mode = NID_FALSE;
+    } else {
+        sprintf(buffer, "%"PRIu64, nid_genid_new());
+        send_data = buffer;
+        send_data_len = strlen(buffer);
+        char_mode = NID_TRUE;
+    }
+
+    if (write(fd, send_data, send_data_len) < 1) {
         perror("Write");
         return NID_ERROR;
     }
 
-    close(fd);
+    if (char_mode) {
+        close(fd);
+    }
     return NID_OK;
 }

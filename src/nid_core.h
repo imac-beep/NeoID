@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <time.h>
@@ -13,6 +14,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 
 typedef int32_t nid_bool_t;

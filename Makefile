@@ -1,5 +1,15 @@
-all:
-	@if !(which cmake > /dev/null 2>&1);then echo "======== Need cmake! ========";exit 1;fi;if ! [ -d build ];then mkdir build;fi;cd build;cmake ../;make;
+CFLAGS = -std=gnu99 -O3 -Werror
+OUTPUT_OPTION = -o build/$@
+OUTPUT_OPTION_BIN = -o bin/$@
 
-clean:
-	@if [ -d build ];then rm -rf build;fi;
+all: mkdir neoid
+	@echo "======== Done! ========"
+
+clean: 
+	@rm -rf build
+
+mkdir:
+	@mkdir -p build/bin; mkdir -p build/src;
+
+neoid: src/neoid.o src/nid_event.o src/nid_genid.o src/nid_server.o
+	cd build; $(CC) $(CFLAGS) $? $(OUTPUT_OPTION_BIN)

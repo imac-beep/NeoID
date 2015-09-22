@@ -7,11 +7,11 @@
 
 static int32_t nid_server_env_init(struct server_env *env);
 static int32_t nid_server_accept_process(const struct server_env *env);
-static int32_t nid_server_data_process(const struct server_env *env, int32_t fd);
+static int32_t nid_server_data_process(int32_t fd);
 
 static inline int32_t nid_server_event_loop(const struct server_env *env);
 
-int32_t nid_server_start(uint16_t port, uint32_t backlog, uint8_t machine_id) {
+extern int32_t nid_server_start(uint16_t port, uint32_t backlog, uint8_t machine_id) {
     struct server_env env = {};
     env.port = port;
     env.machine_id = machine_id;
@@ -137,7 +137,7 @@ static inline int32_t nid_server_event_loop(const struct server_env *env) {
                     if (NID_ERROR == nid_server_accept_process(env)) {
                         return NID_ERROR;
                     }
-                } else if (NID_ERROR == nid_server_data_process(env, (int32_t) event->ident)) {
+                } else if (NID_ERROR == nid_server_data_process((int32_t) event->ident)) {
                     return NID_ERROR;
                 }
             } else {
@@ -153,7 +153,7 @@ static inline int32_t nid_server_event_loop(const struct server_env *env) {
 static struct sockaddr c_address;
 static socklen_t c_len;
 static int32_t c_sockfd;
-int32_t nid_server_accept_process(register const struct server_env *env) {
+static int32_t nid_server_accept_process(register const struct server_env *env) {
     do {
         c_sockfd = accept(env->server_sockfd, &c_address, &c_len);
         if (NID_ERROR == c_sockfd) {
@@ -182,7 +182,7 @@ static int64_t read_count;
 static void *send_data;
 static size_t send_data_len;
 static nid_bool_t char_mode;
-int32_t nid_server_data_process(register const struct server_env *env, register int32_t fd) {
+static int32_t nid_server_data_process(register int32_t fd) {
     while ((read_count = read(fd, buffer, BUFSIZ)) > 0) {
         if (read_count < BUFSIZ) {
             break;

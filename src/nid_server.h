@@ -8,6 +8,6 @@ struct server_env {
     uint8_t machine_id;
 };
 
-int32_t nid_server_start(uint16_t port, uint32_t backlog, uint8_t machine_id);
+extern int32_t nid_server_start(uint16_t port, uint32_t backlog, uint8_t machine_id);
 
 #endif //NEOID_NID_SERVER_H

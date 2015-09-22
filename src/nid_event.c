@@ -8,7 +8,7 @@ extern int32_t nid_event_create(void) {
 }
 
 extern int32_t nid_event_add(int32_t handle, int32_t fd, int32_t events) {
-    struct epoll_event env;
+    struct epoll_event env = {};
     env.events = (uint32_t)events | EPOLLET;
     env.data.fd = fd;
     
@@ -16,7 +16,7 @@ extern int32_t nid_event_add(int32_t handle, int32_t fd, int32_t events) {
 }
 
 extern int32_t nid_event_mod(int32_t handle, int32_t fd, int32_t events) {
-    struct epoll_event env;
+    struct epoll_event env = {};
     env.events = (uint32_t)events | EPOLLET;
     env.data.fd = fd;
     
@@ -30,7 +30,7 @@ extern int32_t nid_event_del(int32_t handle, int32_t fd, int32_t events) {
      * the EPOLL_CTL_DEL operation required a non-NULL pointer in event,
      * even though this argument is ignored.
      */
-    struct epoll_event env;
+    struct epoll_event env = {};
     return epoll_ctl(handle, EPOLL_CTL_DEL, fd, &env);
 }
 
@@ -41,7 +41,7 @@ extern int32_t nid_event_create(void) {
 }
 
 extern int32_t nid_event_add(int32_t handle, int32_t fd, int32_t events) {
-    struct kevent env[1];
+    struct kevent env[1] = {};
     EV_SET(env, fd, events, EV_ADD | EV_CLEAR, 0, 0, 0);
     return kevent(handle, env, 1, NULL, 0, NULL);
 }
@@ -51,7 +51,7 @@ extern int32_t nid_event_mod(int32_t handle, int32_t fd, int32_t events) {
 }
 
 extern int32_t nid_event_del(int32_t handle, int32_t fd, int32_t events) {
-    struct kevent env[1];
+    struct kevent env[1] = {};
     EV_SET(env, fd, events, EV_DELETE, 0, 0, 0);
     return kevent(handle, env, 1, NULL, 0, NULL);
 }

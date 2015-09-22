@@ -1,20 +1,20 @@
 #include "nid_core.h"
 #include "neoid.h"
 #include "nid_server.h"
+#include "nid_genid.h"
 
 static void usage(const char *file);
 static int32_t nid_option_init(int argc, char *argv[], struct opt_data *optdata);
 static int32_t nid_deamon_init(void);
 
-
 int main(int argc, char *argv[]) {
-    struct opt_data opt;
+    struct opt_data opt = {};
     if (NID_ERROR == nid_option_init(argc, argv, &opt)) {
         usage(argv[0]);
         return EXIT_FAILURE;
     }
 
-    printf("[Start with: machine_id = %d, port = %d, backlog = %d]\n", opt.machine_id, opt.port, opt.backlog);
+    printf("[Start with: machine_id = %d, port = %d, backlog = %d, deamonize = %d]\n", opt.machine_id, opt.port, opt.backlog, opt.deamonize);
 
     if (opt.deamonize && NID_ERROR == nid_deamon_init()) {
         return EXIT_FAILURE;

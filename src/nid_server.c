@@ -12,7 +12,7 @@ static int32_t nid_server_data_process(const struct server_env *env, int32_t fd)
 static inline int32_t nid_server_event_loop(const struct server_env *env);
 
 int32_t nid_server_start(uint16_t port, uint32_t backlog, uint8_t machine_id) {
-    struct server_env env;
+    struct server_env env = {};
     env.port = port;
     env.machine_id = machine_id;
     if (NID_ERROR == nid_server_env_init(&env)) {
@@ -53,7 +53,7 @@ static int32_t nid_server_env_init(struct server_env *env) {
         return NID_ERROR;
     }
     
-    struct sockaddr_in s_address;
+    struct sockaddr_in s_address = {};
     s_address.sin_family = AF_INET;
     s_address.sin_addr.s_addr = htonl(INADDR_ANY);
     s_address.sin_port = htons(env->port);
@@ -77,7 +77,8 @@ static int32_t nid_server_env_init(struct server_env *env) {
 static inline int32_t nid_server_event_loop(const struct server_env *env) {
     uint32_t i;
     int32_t e_fdnum;
-    struct epoll_event events[MAX_EVENTS];
+    struct epoll_event events[MAX_EVENTS] = {};
+    struct epoll_event *event;
 
     while (NID_TRUE) {
         e_fdnum = epoll_wait(env->eventfd, events, MAX_EVENTS, -1);
@@ -90,17 +91,19 @@ static inline int32_t nid_server_event_loop(const struct server_env *env) {
         }
 
         for (i = 0; i < e_fdnum; i++) {
-            if (events[i].events & EVENT_READ) {
-                if (env->server_sockfd == events[i].data.fd) {
+            event = events + i;
+
+            if (event->events & EVENT_READ) {
+                if (env->server_sockfd == event->data.fd) {
                     if (NID_ERROR == nid_server_accept_process(env)) {
                         return NID_ERROR;
                     }
-                } else if (NID_ERROR == nid_server_data_process(env, events[i].data.fd)) {
+                } else if (NID_ERROR == nid_server_data_process(env, event->data.fd)) {
                     return NID_ERROR;
                 }
             } else {
                 perror("EPOLL error");
-                close(events[i].data.fd);
+                close(event->data.fd);
             }
         }
     }
@@ -111,7 +114,8 @@ static inline int32_t nid_server_event_loop(const struct server_env *env) {
 static inline int32_t nid_server_event_loop(const struct server_env *env) {
     uint32_t i;
     int32_t e_fdnum;
-    struct kevent events[MAX_EVENTS];
+    struct kevent events[MAX_EVENTS] = {};
+    struct kevent *event;
 
     while (NID_TRUE) {
         e_fdnum = kevent(env->eventfd, NULL, 0, events, MAX_EVENTS, NULL);
@@ -124,19 +128,21 @@ static inline int32_t nid_server_event_loop(const struct server_env *env) {
         }
 
         for (i = 0; i < e_fdnum; i++) {
-            if (events[i].flags & EV_EOF) {
-                close((int32_t) events[i].ident);
-            } else if (events[i].flags & EVENT_READ) {
-                if (env->server_sockfd == events[i].ident) {
+            event = events + i;
+
+            if (event->flags & EV_EOF) {
+                close((int32_t) event->ident);
+            } else if (event->flags & EVENT_READ) {
+                if (env->server_sockfd == event->ident) {
                     if (NID_ERROR == nid_server_accept_process(env)) {
                         return NID_ERROR;
                     }
-                } else if (NID_ERROR == nid_server_data_process(env, (int32_t) events[i].ident)) {
+                } else if (NID_ERROR == nid_server_data_process(env, (int32_t) event->ident)) {
                     return NID_ERROR;
                 }
             } else {
                 perror("EVENT error");
-                close((int32_t) events[i].ident);
+                close((int32_t) event->ident);
             }
         }
     }
@@ -144,11 +150,10 @@ static inline int32_t nid_server_event_loop(const struct server_env *env) {
 
 #endif
 
+static struct sockaddr c_address;
+static socklen_t c_len;
+static int32_t c_sockfd;
 int32_t nid_server_accept_process(register const struct server_env *env) {
-    struct sockaddr c_address;
-    int32_t c_sockfd;
-    socklen_t c_len;
-
     do {
         c_sockfd = accept(env->server_sockfd, &c_address, &c_len);
         if (NID_ERROR == c_sockfd) {

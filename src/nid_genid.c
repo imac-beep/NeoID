@@ -10,7 +10,7 @@ static uint64_t tempid;
 static uint64_t machine_id;
 
 extern uint64_t nid_genid_new() {
-    if (resettime || ++subid > 0x00FFFFFF) { //如果id尾部(24 bits)溢出，读秒并轮转
+    if (resettime || 0x00FFFFFF == subid++) { //如果id尾部(24 bits)溢出，读秒并轮转
         /**
          * 如果跑的过快（一秒钟跑了超过一千六百万条），则等到下一秒
          * 该部位代码应该没什么可能被触发到。

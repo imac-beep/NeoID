@@ -98,7 +98,7 @@ static inline int32_t nid_server_event_loop(const struct server_env *env) {
                     if (NID_ERROR == nid_server_accept_process(env)) {
                         return NID_ERROR;
                     }
-                } else if (NID_ERROR == nid_server_data_process(env, event->data.fd)) {
+                } else if (NID_ERROR == nid_server_data_process(event->data.fd)) {
                     return NID_ERROR;
                 }
             } else {

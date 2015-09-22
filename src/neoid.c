@@ -1,7 +1,6 @@
 #include "nid_core.h"
 #include "neoid.h"
 #include "nid_server.h"
-#include "nid_genid.h"
 
 static void usage(const char *file);
 static int32_t nid_option_init(int argc, char *argv[], struct opt_data *optdata);

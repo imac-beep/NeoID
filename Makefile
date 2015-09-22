@@ -1,10 +1,10 @@
-CFLAGS = -std=gnu99 -O3 -Werror
+CFLAGS = -std=gnu99 -O3 -Werror -v
 BUILD_DIR = build
 OUTPUT_OPTION = -o $(BUILD_DIR)/$@
 OUTPUT_OPTION_BIN = -o bin/$@
 
 all: mkdir neoid
-	@echo "======== Done! ========"
+	@echo;echo "======== Success! ========";echo;
 
 clean: 
 	@rm -rf $(BUILD_DIR)

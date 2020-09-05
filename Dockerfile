@@ -1,18 +1,19 @@
-FROM ubuntu
-
+FROM alpine:3.12
 LABEL description="Container to build and serve neoid"
 
-# install build dependencies
-RUN apt-get update && apt-get install -y g++ make
+ENV PROJECT_DIR=/app
 
+WORKDIR $PROJECT_DIR
 # copy neoid source
-COPY src /root/src
-COPY Makefile /root/Makefile
+COPY . $PROJECT_DIR
 
 # build 
-RUN cd /root &&  make
+RUN apk add build-base && make
 
 # expose port
-expose 18989
+ENV APP_PORT=18989
+expose $APP_PORT
+HEALTHCHECK --interval=30s --timeout=30s \
+  CMD curl -fs http://localhost:$APP_PORT || exit 1
 
-ENTRYPOINT ["/root/build/bin/neoid", "-i", "$machine_id", "-b", "1024"]
+ENTRYPOINT ["build/bin/neoid", "-i", "$machine_id", "-b", "1024"]

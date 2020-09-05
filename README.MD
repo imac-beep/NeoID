@@ -24,12 +24,12 @@ neoid [-i machine_id] [-p port] [-b backlog] [-d]
 
 ## 容器运行：
 
-1. 制作镜像 `docker build -t ubuntu-neoid .`
+1. 制作镜像 `docker build -t alpine-neoid .`
 
 2. 容器运行
 
 ```
-nohup docker run --rm -e machine_id=1 -p 8001:18989 ubuntu-neoid &
+nohup docker run --restart always -e machine_id=1 -p 8001:18989 alpine-neoid &
 
-nohup docker run --rm -e machine_id=2 -p 8002:18989 ubuntu-neoid &
+nohup docker run --restart always -e machine_id=2 -p 8002:18989 alpine-neoid &
 ```
